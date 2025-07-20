@@ -35,7 +35,7 @@ Three interchangeable implementations of `IOrderBook`:
 - **Seed**: 42  
 - **Platform**: macOS (Apple M1 Pro 8-core)
 
-### Multi-Trial Engine Results (5x rund @500k events)
+### Multi-Trial Engine Results (5x runs @500k events)
 
 | Variant | Mean Throughput (events/s) | Median (ns) | p95 (ns) | p99 (ns) | Notes |
 |---------|----------------------------|------------:|---------:|---------:|-------|
