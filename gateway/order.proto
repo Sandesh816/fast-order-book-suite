@@ -1,0 +1,97 @@
+syntax = "proto3";
+package fastob;
+
+option go_package = "fastobpb";
+
+message OrderMeta {
+  string client_id        = 1;
+  string gateway_order_id = 2;  
+  int64  recv_unix_ns     = 3;  // Gateway timestamp
+  string risk_status      = 4;  
+}
+
+message LimitOrder {
+  bool is_buy    = 1;
+  int32 price    = 2;
+  int32 qty      = 3;
+  OrderMeta meta = 10;
+}
+
+message MarketOrder {
+  bool is_buy    = 1;
+  int32 qty      = 2;
+  OrderMeta meta = 10;
+}
+
+message CancelOrder {
+  bool is_buy    = 1;
+  int32 price    = 2;
+  int32 qty      = 3;
+  OrderMeta meta = 10;
+}
+
+message SubmitLimitRequest {
+  string client_id = 1;
+  bool   is_buy    = 2;
+  int32  price     = 3;
+  int32  qty       = 4;
+}
+
+message SubmitMarketRequest {
+  string client_id = 1;
+  bool   is_buy    = 2;
+  int32  qty       = 3;
+}
+
+message SubmitCancelRequest {
+  string client_id = 1;
+  bool   is_buy    = 2;
+  int32  price     = 3;
+  int32  qty       = 4;
+}
+
+message Ack {
+  bool ok              = 1;
+  string message       = 2;
+  OrderMeta meta       = 3;
+  int64 engine_done_unix_ns = 4; // (optional future use)
+}
+
+message TopRequest {}
+message TopReply {
+  int32 best_bid = 1;
+  int32 best_ask = 2;
+}
+
+message StatsRequest {}
+message StatsReply {
+  uint64 total_orders      = 1; 
+  uint64 total_rejected    = 2;
+  double avg_latency_us    = 3; 
+  double p50_latency_us    = 4;
+  double p95_latency_us    = 5;
+  double p99_latency_us    = 6;
+}
+
+message ResetRequest {
+  string client_id = 1; 
+}
+message ResetReply {
+  bool ok = 1;
+}
+
+service EngineInternal {
+  rpc Limit  (LimitOrder)  returns (Ack);
+  rpc Market (MarketOrder) returns (Ack);
+  rpc Cancel (CancelOrder) returns (Ack);
+  rpc Top    (TopRequest)  returns (TopReply);
+}
+
+service GatewayPublic {
+  rpc SubmitLimit  (SubmitLimitRequest)  returns (Ack);
+  rpc SubmitMarket (SubmitMarketRequest) returns (Ack);
+  rpc SubmitCancel (SubmitCancelRequest) returns (Ack);
+  rpc Top          (TopRequest)          returns (TopReply);
+  rpc Stats        (StatsRequest)        returns (StatsReply);
+  rpc Reset        (ResetRequest)        returns (ResetReply);
+}
